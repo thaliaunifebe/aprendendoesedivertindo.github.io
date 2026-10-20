@@ -36,34 +36,77 @@
     const IconArrowRight = ({ size = 24 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>;
     const IconCheck = ({ size = 24 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>;
     const IconRestart = ({ size = 24 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 2v6h6"/><path d="M3 13a9 9 0 1 0 3-7.7L3 8"/></svg>;
+    const IconSpeaker = ({ size = 24 }) => (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"/>
+        <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+        <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+      </svg>
+    );
 
     // --- Sequência Progressiva de Perguntas ---
     const sequenciaDePerguntas = [
       // FÁCIL
-      { id: 1, nivel: 'Fácil', type: 'syllable', text: 'VA - ___', options: ['CA', 'CO'], correct: 'CA', icon: '🐄' },
-      { id: 2, nivel: 'Fácil', type: 'syllable', text: 'RA - ___', options: ['TO', 'TU'], correct: 'TO', icon: '🐭' },
-      { id: 3, nivel: 'Fácil', type: 'syllable', text: 'SA - ___', options: ['PE', 'PO'], correct: 'PO', icon: '🐸' },
-      { id: 4, nivel: 'Fácil', type: 'color', text: 'Qual objeto é o AMARELO?', options: ['Sol', 'Céu', 'Sapo'], correct: 'Sol', icon: '🎨' },
-      { id: 5, nivel: 'Fácil', type: 'color', text: 'Qual objeto é o VERDE?', options: ['Sol', 'Céu', 'Sapo'], correct: 'Sapo', icon: '🎨' },
-      { id: 6, nivel: 'Fácil', type: 'color', text: 'Qual objeto é o AZUL?', options: ['Céu', 'Sapo', 'Sol'], correct: 'Céu', icon: '🎨' },
-      { id: 7, nivel: 'Fácil', type: 'habitat', text: 'Onde o Sapo mora?', options: ['Lagoa', 'Colmeia', 'Deserto'], correct: 'Lagoa', icon: '🐸' },
-      { id: 8, nivel: 'Fácil', type: 'habitat', text: 'Onde a Abelha mora?', options: ['Colmeia', 'Lagoa', 'Deserto'], correct: 'Colmeia', icon: '🐝' },
-      
+      { id: 1, nivel: 'Fácil', type: 'syllable', text: 'VA - ___', descricao: 'Escolha a sílaba que completa a palavra VACA.', options: ['CA', 'CO'], correct: 'CA', icon: '🐄' },
+      { id: 2, nivel: 'Fácil', type: 'syllable', text: 'RA - ___', descricao: 'Escolha a sílaba que completa a palavra RATO.', options: ['TO', 'TU'], correct: 'TO', icon: '🐭' },
+      { id: 3, nivel: 'Fácil', type: 'syllable', text: 'SA - ___', descricao: 'Escolha a sílaba que completa a palavra SAPO.', options: ['PE', 'PO'], correct: 'PO', icon: '🐸' },
+      { id: 4, nivel: 'Fácil', type: 'color', text: 'Qual objeto é o AMARELO?', descricao: 'Escolha o objeto que é da cor amarela.', options: ['Sol', 'Céu', 'Sapo'], correct: 'Sol', icon: '🎨' },
+      { id: 5, nivel: 'Fácil', type: 'color', text: 'Qual objeto é o VERDE?', descricao: 'Escolha o objeto que é da cor verde.', options: ['Sol', 'Céu', 'Sapo'], correct: 'Sapo', icon: '🎨' },
+      { id: 6, nivel: 'Fácil', type: 'color', text: 'Qual objeto é o AZUL?', descricao: 'Escolha o objeto que é da cor azul.', options: ['Céu', 'Sapo', 'Sol'], correct: 'Céu', icon: '🎨' },
+      { id: 7, nivel: 'Fácil', type: 'habitat', text: 'Onde o Sapo mora?', descricao: 'Escolha o lugar onde o sapo mora.', options: ['Lagoa', 'Colmeia', 'Deserto'], correct: 'Lagoa', icon: '🐸' },
+      { id: 8, nivel: 'Fácil', type: 'habitat', text: 'Onde a Abelha mora?', descricao: 'Escolha o lugar onde a abelha mora.', options: ['Colmeia', 'Lagoa', 'Deserto'], correct: 'Colmeia', icon: '🐝' },
+
       // MÉDIO
-      { id: 10, nivel: 'Médio', type: 'syllable', text: 'SA - PA - ___', options: ['TO', 'TA', 'TE'], correct: 'TO', icon: '👞' },
-      { id: 11, nivel: 'Médio', type: 'syllable', text: 'CA - SA - ___', options: ['CA', 'CO', 'CU'], correct: 'CO', icon: '🧥' },
-      { id: 12, nivel: 'Médio', type: 'syllable', text: 'TA - PE - ___', options: ['TA', 'TI', 'TE'], correct: 'TE', icon: '🛋️' },
-      { id: 14, nivel: 'Médio', type: 'rima', text: 'O que rima com SABÃO?', options: ['BALÃO', 'TELHA', 'CASA'], correct: 'BALÃO', icon: '🫧' }
+      { id: 10, nivel: 'Médio', type: 'syllable', text: 'SA - PA - ___', descricao: 'Escolha a sílaba que completa a palavra SAPATO.', options: ['TO', 'TA', 'TE'], correct: 'TO', icon: '👞' },
+      { id: 11, nivel: 'Médio', type: 'syllable', text: 'CA - SA - ___', descricao: 'Escolha a sílaba que completa a palavra CASACO.', options: ['CA', 'CO', 'CU'], correct: 'CO', icon: '🧥' },
+      { id: 12, nivel: 'Médio', type: 'syllable', text: 'TA - PE - ___', descricao: 'Escolha a sílaba que completa a palavra TAPETE.', options: ['TA', 'TI', 'TE'], correct: 'TE', icon: '🛋️' },
+      { id: 14, nivel: 'Médio', type: 'rima', text: 'O que rima com SABÃO?', descricao: 'Escolha a palavra que rima com SABÃO.', options: ['BALÃO', 'TELHA', 'CASA'], correct: 'BALÃO', icon: '🫧' },
 
       // DIFÍCIL
-      { id: 18, nivel: 'Difícil', type: 'syllable', text: 'Selecione o animal atrás do patinho amarelinho', options: ['TARTARUGA', 'SAPO', 'PATINHO AMARELINHO','ELEFANTE'], correct: 'ELEFANTE', icon: '🐘' },
-      { id: 19, nivel: 'Difícil', type: 'syllable', text: 'Selecione a cena em que o macaco está atrás da árvore', options: ['LADO', 'FRENTE', 'ATRÁS'], correct: 'ATRÁS', icon: '🐘' },
-      { id: 22, nivel: 'Difícil', type: 'syllable', text: 'E - LE - FAN - ___', options: ['TE', 'TA', 'TI', 'TU'], correct: 'TE', icon: '🐘' },
-      { id: 23, nivel: 'Difícil', type: 'syllable', text: 'BI - CI - CLE - ___', options: ['TA', 'BA', 'BE', 'BO'], correct: 'TA', icon: '🚲' },
-      
+      { id: 18, nivel: 'Difícil', type: 'syllable', text: 'Selecione o animal atrás do patinho amarelinho', descricao: 'Escolha o animal que está atrás do patinho amarelinho.', options: ['TARTARUGA', 'SAPO', 'PATINHO AMARELINHO', 'ELEFANTE'], correct: 'ELEFANTE', icon: '🐘' },
+      { id: 19, nivel: 'Difícil', type: 'syllable', text: 'Selecione a cena em que o macaco está atrás da árvore', descricao: 'Escolha a posição em que o macaco está em relação à árvore.', options: ['LADO', 'FRENTE', 'ATRÁS'], correct: 'ATRÁS', icon: '🐘' },
+      { id: 22, nivel: 'Difícil', type: 'syllable', text: 'E - LE - FAN - ___', descricao: 'Escolha a sílaba que completa a palavra ELEFANTE.', options: ['TE', 'TA', 'TI', 'TU'], correct: 'TE', icon: '🐘' },
+      { id: 23, nivel: 'Difícil', type: 'syllable', text: 'BI - CI - CLE - ___', descricao: 'Escolha a sílaba que completa a palavra BICICLETA.', options: ['TA', 'BA', 'BE', 'BO'], correct: 'TA', icon: '🚲' },
+
       // EXPERT
-      { id: 27, nivel: 'Expert', type: 'syllable', text: 'PA - RA - LE - LE - PÍ - PE - ___', options: ['DO', 'PE-DA', 'PI-DA', 'PO-DO'], correct: 'DO', icon: '🧱' }
+      { id: 27, nivel: 'Expert', type: 'syllable', text: 'PA - RA - LE - LE - PÍ - PE - ___', descricao: 'Escolha a sílaba que completa a palavra PARALELEPÍPEDO.', options: ['DO', 'PE-DA', 'PI-DA', 'PO-DO'], correct: 'DO', icon: '🧱' }
     ];
+
+    // --- Função de fala (Web Speech API) ---
+    const falarTexto = (texto, aoIniciar, aoTerminar) => {
+      if (!('speechSynthesis' in window)) return false;
+      window.speechSynthesis.cancel(); // para qualquer fala anterior
+      const fala = new SpeechSynthesisUtterance(texto);
+      fala.lang = 'pt-BR';
+      fala.rate = 0.85;  // um pouco mais devagar, bom para crianças
+      fala.pitch = 1.1;
+      if (aoIniciar) fala.onstart = aoIniciar;
+      if (aoTerminar) {
+        fala.onend = aoTerminar;
+        fala.onerror = aoTerminar;
+      }
+      window.speechSynthesis.speak(fala);
+      return true;
+    };
+
+    const BotaoAudio = ({ texto }) => {
+      const [falando, setFalando] = useState(false);
+
+      const falar = () => {
+        const ok = falarTexto(texto, () => setFalando(true), () => setFalando(false));
+        if (!ok) alert('Seu navegador não suporta áudio.');
+      };
+
+      return (
+        <button
+          onClick={falar}
+          aria-label="Ouvir a instrução"
+          className={`inline-flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-bold text-xl py-2 px-6 rounded-full shadow-md border-b-4 border-blue-700 transition hover:scale-105 active:scale-95 ${falando ? 'animate-bounce-slight' : ''}`}
+        >
+          <IconSpeaker size={28} /> Ouvir
+        </button>
+      );
+    };
 
     const ForestBackground = ({ children }) => (
     <div
@@ -87,7 +130,7 @@
 
     function App() {
       // Estados possíveis: 'START', 'PLAYING', 'FEEDBACK', 'LEVEL_UP', 'END'
-      const [gameState, setGameState] = useState('START'); 
+      const [gameState, setGameState] = useState('START');
       const [currentIndex, setCurrentIndex] = useState(0);
       const [score, setScore] = useState(0);
       const [isCorrect, setIsCorrect] = useState(false);
@@ -99,6 +142,7 @@
       };
 
       const handleAnswer = (option) => {
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel(); // para o áudio ao responder
         const correct = option === sequenciaDePerguntas[currentIndex].correct;
         setIsCorrect(correct);
         if (correct) setScore(prev => prev + 10);
@@ -113,7 +157,7 @@
         if (currentIndex + 1 < sequenciaDePerguntas.length) {
           const nivelAtual = sequenciaDePerguntas[currentIndex].nivel;
           const proximoNivel = sequenciaDePerguntas[currentIndex + 1].nivel;
-          
+
           if (nivelAtual !== proximoNivel) {
             setGameState('LEVEL_UP');
           } else {
@@ -143,9 +187,16 @@
 
       const perguntaAtual = sequenciaDePerguntas[currentIndex];
 
+      // Lê a descrição automaticamente ao abrir cada pergunta
+      useEffect(() => {
+        if (gameState === 'PLAYING') {
+          falarTexto(perguntaAtual.descricao);
+        }
+      }, [currentIndex, gameState]);
+
       return (
         <ForestBackground>
-          
+
           {gameState === 'START' && (
             <CloudBox className="w-full max-w-xl animate-fade-in-up">
               {/* <div className="text-6xl mb-4">🌳🦉✨</div> */}
@@ -153,7 +204,7 @@
                 Aprendendo e se<br/>Divertindo!
               </h1>
               <p className="text-xl text-gray-500 font-medium mb-8">Vamos começar no nível fácil e subir de dificuldade!</p>
-              <button 
+              <button
                 onClick={startGame}
                 className="bg-gradient-to-b from-[#B2D548] to-[#9fc23d] hover:from-[#a3c63f] hover:to-[#8bb034] text-white font-extrabold text-3xl py-4 px-12 rounded-full shadow-lg transform transition hover:scale-105 active:scale-95 flex items-center justify-center mx-auto gap-3 border-b-4 border-green-700"
               >
@@ -175,11 +226,18 @@
 
               <CloudBox className="w-full">
                 <div className="text-6xl mb-6">{perguntaAtual.icon}</div>
-                <div className="bg-blue-50 border-4 border-blue-200 rounded-3xl py-8 px-6 mb-8 shadow-inner">
+                <div className="bg-blue-50 border-4 border-blue-200 rounded-3xl py-8 px-6 mb-4 shadow-inner">
                   <h2 className="text-3xl md:text-4xl font-black text-blue-700 leading-tight">
                     {perguntaAtual.text}
                   </h2>
                 </div>
+
+                {/* Descrição + áudio */}
+                <div className="mb-8 flex flex-col items-center gap-3">
+                  <p className="text-xl text-gray-600 font-medium">{perguntaAtual.descricao}</p>
+                  <BotaoAudio texto={perguntaAtual.descricao} />
+                </div>
+
                 <div className="flex flex-wrap justify-center gap-4">
                   {perguntaAtual.options.map((opt, idx) => (
                     <button key={idx} onClick={() => handleAnswer(opt)} className={`font-extrabold text-3xl py-4 px-8 rounded-[2rem] shadow-md transform transition hover:-translate-y-1 active:translate-y-1 min-w-[140px] border-b-8 active:border-b-0 mt-2 active:mt-[10px] ${getButtonColor(opt, perguntaAtual.type)}`}>
@@ -248,7 +306,7 @@
               </button>
             </CloudBox>
           )}
-          
+
         </ForestBackground>
       );
     }
