@@ -101,27 +101,23 @@
     // --- Voz feminina suave (Web Speech API) ---
     const temVoz = () => 'speechSynthesis' in window;
     let vozEscolhida = null;
-    let vozManual = null; // nome escolhido pela pessoa no seletor
     const norm = (v) => (v.lang || '').replace('_', '-').toLowerCase();
-    const feminina = /francisca|thalita|luciana|fernanda|vit[oó]ria|camila|maria|helena|raquel|catarina|joana|google portugu[eê]s|\bfemale\b|feminin|woman|mulher/i;
+    const feminina = /francisca|thalita|luciana|fernanda|vit[oó]ria|camila|maria|helena|helia|raquel|catarina|joana|in[eê]s|am[aá]lia|leila|giovanna|google portugu[eê]s|\bfemale\b|feminin|woman|mulher/i;
     const masculina = /daniel|ant[oó]nio|felipe|ricardo|jorge|jo[aã]o|\bmale\b|masculin|\bman\b/i;
  
+    const ehFeminina = (v) => feminina.test(v.name) && !masculina.test(v.name);
+ 
+    // Só entram vozes femininas em português (pt-BR primeiro). Nunca voz masculina.
     const listarVozesPt = () => {
       if (!temVoz()) return [];
-      const todas = window.speechSynthesis.getVoices().filter(v => norm(v).startsWith('pt'));
-      // pt-BR primeiro, depois as vozes femininas
-      return todas.sort((a, b) =>
-        (norm(b) === 'pt-br') - (norm(a) === 'pt-br') ||
-        (feminina.test(b.name) && !masculina.test(b.name)) - (feminina.test(a.name) && !masculina.test(a.name)));
+      return window.speechSynthesis.getVoices()
+        .filter(v => norm(v).startsWith('pt') && ehFeminina(v))
+        .sort((x, y) => (norm(y) === 'pt-br') - (norm(x) === 'pt-br'));
     };
  
     const escolherVoz = () => {
       const lista = listarVozesPt();
-      vozEscolhida =
-        lista.find(v => v.name === vozManual) ||
-        lista.find(v => feminina.test(v.name) && !masculina.test(v.name)) ||
-        lista.find(v => !masculina.test(v.name)) ||
-        lista[0] || null;
+      vozEscolhida = lista[0] || null;
     };
  
     if (temVoz()) {
@@ -132,10 +128,11 @@
     const falarTexto = (texto, aoIniciar, aoTerminar) => {
       if (!temVoz()) return false;
       window.speechSynthesis.cancel();
-      if (!vozEscolhida) escolherVoz();
+      escolherVoz();
+      if (!vozEscolhida) return false; // sem voz feminina disponível: não fala
       const fala = new SpeechSynthesisUtterance(texto);
       fala.lang = 'pt-BR';
-      if (vozEscolhida) fala.voice = vozEscolhida;
+      fala.voice = vozEscolhida;
       fala.rate = 0.85;   // devagar e calma, bom para crianças
       fala.pitch = 1.05;  // levemente mais agudo, mas sem exagero (suave)
       fala.volume = 0.9;
@@ -148,35 +145,11 @@
       return true;
     };
  
-    const SeletorVoz = () => {
-      const [vozes, setVozes] = useState(listarVozesPt());
-      const [nome, setNome] = useState(vozEscolhida ? vozEscolhida.name : '');
-      useEffect(() => {
-        const atualizar = () => { escolherVoz(); setVozes(listarVozesPt()); setNome(vozEscolhida ? vozEscolhida.name : ''); };
-        atualizar();
-        if (temVoz()) window.speechSynthesis.addEventListener('voiceschanged', atualizar);
-        return () => { if (temVoz()) window.speechSynthesis.removeEventListener('voiceschanged', atualizar); };
-      }, []);
-      if (!vozes.length) return null;
-      const mudar = (e) => {
-        vozManual = e.target.value; setNome(vozManual); escolherVoz();
-        falarTexto('Olá! Eu sou a voz que vai ajudar você no jogo.');
-      };
-      return (
-        <div className="mb-6 flex flex-col items-center gap-2">
-          <label className="text-gray-500 font-bold">Voz da narração:</label>
-          <select value={nome} onChange={mudar} className="border-4 border-blue-200 rounded-2xl py-2 px-4 text-lg font-bold text-blue-700 bg-white">
-            {vozes.map(v => <option key={v.name} value={v.name}>{v.name}</option>)}
-          </select>
-        </div>
-      );
-    };
- 
     const BotaoAudio = ({ texto }) => {
       const [falando, setFalando] = useState(false);
       const falar = () => {
         const ok = falarTexto(texto, () => setFalando(true), () => setFalando(false));
-        if (!ok) alert('Seu navegador não suporta áudio.');
+        if (!ok) alert('Não encontrei uma voz feminina em português neste aparelho.');
       };
       return (
         <button
@@ -410,8 +383,7 @@
               <h1 className="text-4xl md:text-5xl font-black text-[#B2D548] mb-4 drop-shadow-sm leading-tight">
                 Aprendendo e se<br/>Divertindo!
               </h1>
-              <p className="text-xl text-gray-500 font-medium mb-6">Vamos começar no nível fácil e subir de dificuldade!</p>
-              <SeletorVoz />
+              <p className="text-xl text-gray-500 font-medium mb-8">Vamos começar no nível fácil e subir de dificuldade!</p>
               <button
                 onClick={startGame}
                 className="bg-gradient-to-b from-[#B2D548] to-[#9fc23d] hover:from-[#a3c63f] hover:to-[#8bb034] text-white font-extrabold text-3xl py-4 px-12 rounded-full shadow-lg transform transition hover:scale-105 active:scale-95 flex items-center justify-center mx-auto gap-3 border-b-4 border-green-700"
