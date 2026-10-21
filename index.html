@@ -31,10 +31,10 @@
 </head>
 <body>
   <div id="root"></div>
-
+ 
   <script type="text/babel" data-type="module">
     const { useState, useEffect, useMemo } = React;
-
+ 
     // --- Ícones SVG embutidos ---
     const IconPlay = ({ size = 24 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>;
     const IconStar = ({ size = 24, className = '' }) => <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>;
@@ -48,7 +48,7 @@
         <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
       </svg>
     );
-
+ 
     // --- Sequência Progressiva de Perguntas ---
     // "descricao" é o texto lido em voz alta
     const sequenciaDePerguntas = [
@@ -61,14 +61,14 @@
       {nivel: 'Fácil', type: 'color', text: 'Qual bolinha é da cor AZUL?', descricao: 'Escolha a bolinha da cor azul.', options: ['facil/verde.png', 'facil/azul.png', 'facil/roxo.png'], correct: 'facil/azul.png', icon: null },
       {nivel: 'Fácil', type: 'habitat', text: 'Onde o Sapo mora?', descricao: 'Escolha o lugar onde o sapo mora.', options: ['facil/lagoa.png', 'facil/colmeia.png', 'facil/deserto.png'], correct: 'facil/lagoa.png', icon: 'facil/sapo.png' },
       {nivel: 'Fácil', type: 'habitat', text: 'Onde a Abelha mora?', descricao: 'Escolha o lugar onde a abelha mora.', options: ['facil/deserto.png', 'facil/lagoa.png', 'facil/colmeia.png'], correct: 'facil/colmeia.png', icon: 'facil/abelha.png' },
-
+ 
       // MÉDIO
       {nivel: 'Médio', type: 'syllable', text: 'SA - PA - ___', descricao: 'Escolha a sílaba que completa a palavra SAPATO.', options: ['TO', 'TA', 'TE'], correct: 'TO', icon: 'medio/sapato.png' },
       {nivel: 'Médio', type: 'syllable', text: 'CA - SA - ___', descricao: 'Escolha a sílaba que completa a palavra CASACO.', options: ['CA', 'CO', 'CI'], correct: 'CO', icon: 'medio/casaco.png' },
       {nivel: 'Médio', type: 'syllable', text: 'TA - PE - ___', descricao: 'Escolha a sílaba que completa a palavra TAPETE.', options: ['TA', 'TI', 'TE'], correct: 'TE', icon: 'medio/tapete.png' },
       {nivel: 'Médio', type: 'rima', text: 'O que rima com SABÃO?', descricao: 'Escolha a figura que rima com SABÃO.', options: ['medio/balao.png', 'medio/telha.png', 'medio/casa.png'], correct: 'medio/balao.png', icon: 'medio/sabao.png' },
       {nivel: 'Médio', type: 'ligue', text: 'Ligue os conjuntos com a mesma quantidade', descricao: 'Ligue os conjuntos que têm a mesma quantidade de bichinhos. Clique em uma figura da esquerda e depois na da direita.', pares: [{ a: 'medio/cachorro.png',   b: 'medio/tartaruga.png' }, { a: 'medio/borboletas.png',  b: 'medio/abelhas.png' }, { a: 'medio/joaninhas.png', b: 'medio/peixes.png' }], options: [], correct: 'ok', icon: null, fixo: true },
-
+ 
       // DIFÍCIL
       {nivel: 'Difícil', type: 'syllable', text: 'Selecione o animal atrás do patinho amarelinho', descricao: 'Escolha o animal que está atrás do patinho amarelinho.', options: ['dificil/tartaruga.png', 'dificil/pato.png', 'dificil/elefante.png', 'dificil/sapo.png'], correct: 'dificil/elefante.png', icon: null, fixo: true },
       {nivel: 'Difícil', type: 'syllable', text: 'Selecione a cena em que o macaco está atrás da árvore', descricao: 'Escolha a cena em que o macaco está atrás da árvore.', options: ['dificil/macacoladoarvore.png', 'dificil/macacofrentearvore.png', 'dificil/macacotrasarvore.png'], correct: 'dificil/macacotrasarvore.png', icon: 'dificil/macaco.png' },
@@ -76,7 +76,7 @@
       {nivel: 'Difícil', type: 'syllable', text: 'Selecione a cena em que o macaco está ao lado da árvore', descricao: 'Escolha a cena em que o macaco está ao lado da árvore.', options: ['dificil/macacotrasarvore.png', 'dificil/macacoladoarvore.png', 'dificil/macacofrentearvore.png'], correct: 'dificil/macacoladoarvore.png', icon: 'dificil/macaco.png' },
       {nivel: 'Difícil', type: 'syllable', text: 'E - LE - FAN - ___', descricao: 'Escolha a sílaba que completa a palavra ELEFANTE.', options: ['TE', 'TA', 'TI', 'TU'], correct: 'TE', icon: 'dificil/elefante.png' },
       {nivel: 'Difícil', type: 'syllable', text: 'BI - CI - CLE - ___', descricao: 'Escolha a sílaba que completa a palavra BICICLETA.', options: ['TA', 'DA', 'TE', 'BO'], correct: 'TA', icon: 'dificil/bike.png' },
-
+ 
       // EXPERT
       {nivel: 'Expert', type: 'contagem', text: 'Contando as figuras', descricao: 'Conte quantas figuras tem na imagem e escolha o número certo.', options: ['3', '4', '5'], correct: '3', icon: 'expert/saposconta.png', fixo: true },
       {nivel: 'Expert', type: 'contagem', text: 'Contando as figuras', descricao: 'Conte quantas figuras tem na imagem e escolha o número certo.', options: ['4', '6', '8'], correct: '6', icon: 'expert/macacosconta.png', fixo: true },
@@ -94,35 +94,41 @@
           { x: 71, y: 67, w: 8,  h: 10 }    // arbusto pequeno na margem direita
         ], options: [], correct: 'capivara', icon: null }
     ].map((p, i) => ({ ...p, id: i + 1 }));
-
+ 
     const perguntaCapivara = sequenciaDePerguntas.find(p => p.type === 'esconde');
     const embaralhar = (lista) => [...lista].sort(() => Math.random() - 0.5);
-
+ 
     // --- Voz feminina suave (Web Speech API) ---
     const temVoz = () => 'speechSynthesis' in window;
     let vozEscolhida = null;
-
+    let vozManual = null; // nome escolhido pela pessoa no seletor
+    const norm = (v) => (v.lang || '').replace('_', '-').toLowerCase();
+    const feminina = /francisca|thalita|luciana|fernanda|vit[oó]ria|camila|maria|helena|raquel|catarina|joana|google portugu[eê]s|\bfemale\b|feminin|woman|mulher/i;
+    const masculina = /daniel|ant[oó]nio|felipe|ricardo|jorge|jo[aã]o|\bmale\b|masculin|\bman\b/i;
+ 
+    const listarVozesPt = () => {
+      if (!temVoz()) return [];
+      const todas = window.speechSynthesis.getVoices().filter(v => norm(v).startsWith('pt'));
+      // pt-BR primeiro, depois as vozes femininas
+      return todas.sort((a, b) =>
+        (norm(b) === 'pt-br') - (norm(a) === 'pt-br') ||
+        (feminina.test(b.name) && !masculina.test(b.name)) - (feminina.test(a.name) && !masculina.test(a.name)));
+    };
+ 
     const escolherVoz = () => {
-      if (!temVoz()) return;
-      const todas = window.speechSynthesis.getVoices();
-      const norm = (v) => (v.lang || '').replace('_', '-').toLowerCase();
-      const ptBR = todas.filter(v => norm(v) === 'pt-br');
-      const pt = todas.filter(v => norm(v).startsWith('pt'));
-      const lista = ptBR.length ? ptBR : pt;
-      const feminina = /francisca|luciana|maria|vit[oó]ria|camila|fernanda|thalita|google portugu[eê]s|\bfemale\b|feminin/i;
-      const masculina = /daniel|ant[oó]nio|felipe|ricardo|jorge|\bmale\b|masculin/i;
+      const lista = listarVozesPt();
       vozEscolhida =
+        lista.find(v => v.name === vozManual) ||
         lista.find(v => feminina.test(v.name) && !masculina.test(v.name)) ||
         lista.find(v => !masculina.test(v.name)) ||
         lista[0] || null;
     };
-
+ 
     if (temVoz()) {
       escolherVoz();
-      // muitos navegadores carregam as vozes só depois de um instante
       window.speechSynthesis.onvoiceschanged = escolherVoz;
     }
-
+ 
     const falarTexto = (texto, aoIniciar, aoTerminar) => {
       if (!temVoz()) return false;
       window.speechSynthesis.cancel();
@@ -141,7 +147,31 @@
       window.speechSynthesis.speak(fala);
       return true;
     };
-
+ 
+    const SeletorVoz = () => {
+      const [vozes, setVozes] = useState(listarVozesPt());
+      const [nome, setNome] = useState(vozEscolhida ? vozEscolhida.name : '');
+      useEffect(() => {
+        const atualizar = () => { escolherVoz(); setVozes(listarVozesPt()); setNome(vozEscolhida ? vozEscolhida.name : ''); };
+        atualizar();
+        if (temVoz()) window.speechSynthesis.addEventListener('voiceschanged', atualizar);
+        return () => { if (temVoz()) window.speechSynthesis.removeEventListener('voiceschanged', atualizar); };
+      }, []);
+      if (!vozes.length) return null;
+      const mudar = (e) => {
+        vozManual = e.target.value; setNome(vozManual); escolherVoz();
+        falarTexto('Olá! Eu sou a voz que vai ajudar você no jogo.');
+      };
+      return (
+        <div className="mb-6 flex flex-col items-center gap-2">
+          <label className="text-gray-500 font-bold">Voz da narração:</label>
+          <select value={nome} onChange={mudar} className="border-4 border-blue-200 rounded-2xl py-2 px-4 text-lg font-bold text-blue-700 bg-white">
+            {vozes.map(v => <option key={v.name} value={v.name}>{v.name}</option>)}
+          </select>
+        </div>
+      );
+    };
+ 
     const BotaoAudio = ({ texto }) => {
       const [falando, setFalando] = useState(false);
       const falar = () => {
@@ -158,7 +188,7 @@
         </button>
       );
     };
-
+ 
     const ForestBackground = ({ children }) => (
     <div
       className="min-h-screen relative overflow-hidden flex flex-col items-center justify-center p-4 font-sans selection:bg-[#B2D548]"
@@ -172,27 +202,27 @@
       <div className="relative z-10 w-full max-w-5xl flex justify-center">{children}</div>
     </div>
     );
-
+ 
     const CloudBox = ({ children, className = '' }) => (
       <div className={`bg-white rounded-[3rem] p-8 md:p-12 shadow-2xl border-8 border-white bg-opacity-95 text-center relative ${className}`}>
         {children}
       </div>
     );
-
+ 
     function CapivaraEscondida({ imagem, capivara, falsos, onErrar, onAchar }) {
       const [achou, setAchou] = useState(false);
-
+ 
       // depois de 3 segundos de comemoração, avisa o jogo
       useEffect(() => {
         if (!achou) return;
         const t = setTimeout(onAchar, 3000);
         return () => clearTimeout(t);
       }, [achou]);
-
+ 
       return (
         <div className="relative w-full mx-auto">
           <img src={imagem} alt="" className="block w-full rounded-3xl" />
-
+ 
           {falsos.map((f, i) => (
             <button
               key={i}
@@ -201,7 +231,7 @@
               style={{ left: f.x + '%', top: f.y + '%', width: f.w + '%', height: f.h + '%' }}
             />
           ))}
-
+ 
           <button
             onClick={() => setAchou(true)}
             className="absolute cursor-pointer"
@@ -209,7 +239,7 @@
           >
             <img src={capivara.img} alt="" className="block w-full" />
           </button>
-
+ 
           {achou && ReactDOM.createPortal(
             <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black bg-opacity-60 fade-in">
               <img src={capivara.img} alt="" className="capivara-cresce" style={{ width: '60vmin' }} />
@@ -220,7 +250,7 @@
         </div>
       );
     }
-
+ 
     function LigueQuestao({ pares, onConcluir }) {
       // coluna da direita embaralhada (só uma vez)
       const [direita] = useState(() =>
@@ -229,20 +259,20 @@
       const [selecionado, setSelecionado] = useState(null); // id escolhido na esquerda
       const [feitos, setFeitos] = useState([]);              // ids dos pares já ligados
       const [erro, setErro] = useState(null);                // id da direita que errou
-
+ 
       useEffect(() => {
         if (feitos.length === pares.length) {
           const t = setTimeout(onConcluir, 700);
           return () => clearTimeout(t);
         }
       }, [feitos]);
-
+ 
       const clicarEsquerda = (id) => {
         if (feitos.includes(id)) return;
         setSelecionado(id);
         setErro(null);
       };
-
+ 
       const clicarDireita = (id) => {
         if (selecionado === null || feitos.includes(id)) return;
         if (selecionado === id) {
@@ -254,14 +284,14 @@
           setSelecionado(null);
         }
       };
-
+ 
       const estilo = (id, escolhido, errado) =>
         'p-2 rounded-3xl border-4 transition transform hover:scale-105 ' +
         (feitos.includes(id) ? 'border-green-500 bg-green-100 opacity-70'
           : escolhido ? 'border-blue-500 bg-blue-100'
           : errado ? 'border-orange-400 bg-orange-100'
           : 'border-transparent bg-white');
-
+ 
       return (
         <div className="flex justify-center gap-16 w-full">
           <div className="flex flex-col gap-4">
@@ -281,7 +311,7 @@
         </div>
       );
     }
-
+ 
     function App() {
       // Estados possíveis: 'START', 'PLAYING', 'FEEDBACK', 'LEVEL_UP', 'END'
       const [gameState, setGameState] = useState('START');
@@ -289,16 +319,16 @@
       const [score, setScore] = useState(0);
       const [isCorrect, setIsCorrect] = useState(false);
       const [posCapivara, setPosCapivara] = useState(0);
-
+ 
       const pararAudio = () => { if (temVoz()) window.speechSynthesis.cancel(); };
-
+ 
       const startGame = () => {
         setCurrentIndex(0);
         setScore(0);
         setPosCapivara(Math.floor(Math.random() * perguntaCapivara.capivara.posicoes.length));
         setGameState('PLAYING');
       };
-
+ 
       const handleAnswer = (option) => {
         pararAudio(); // para o áudio ao responder
         const correct = option === sequenciaDePerguntas[currentIndex].correct;
@@ -306,16 +336,16 @@
         if (correct) setScore(prev => prev + 10);
         setGameState('FEEDBACK');
       };
-
+ 
       const tentarNovamente = () => {
         setGameState('PLAYING');
       };
-
+ 
       const avancarPergunta = () => {
         if (currentIndex + 1 < sequenciaDePerguntas.length) {
           const nivelAtual = sequenciaDePerguntas[currentIndex].nivel;
           const proximoNivel = sequenciaDePerguntas[currentIndex + 1].nivel;
-
+ 
           if (nivelAtual !== proximoNivel) {
             setGameState('LEVEL_UP');
           } else {
@@ -326,21 +356,21 @@
           setGameState('END');
         }
       };
-
+ 
       const irParaProximoNivel = () => {
         setCurrentIndex(prev => prev + 1);
         setGameState('PLAYING');
       };
-
+ 
       const acharCapivara = () => {
         setScore(prev => prev + 10);
         setGameState('END');
       };
-
+ 
       const getButtonColor = () => {
         return 'bg-purple-400 hover:bg-purple-500 border-purple-500 text-white';
       };
-
+ 
       const perguntaAtual = sequenciaDePerguntas[currentIndex];
       const opcoes = useMemo(() => perguntaAtual.fixo ? perguntaAtual.options : embaralhar(perguntaAtual.options), [currentIndex]);
       const nomesComAcento = { balao: 'Balão'};
@@ -349,24 +379,39 @@
         if (nomesComAcento[arquivo]) return nomesComAcento[arquivo];
         return arquivo.charAt(0).toUpperCase() + arquivo.slice(1);
       };
-
+ 
+      // Se alguma imagem não carregar, mostra o nome dela no lugar
+      useEffect(() => {
+        const aoFalhar = (e) => {
+          const img = e.target;
+          if (img.tagName !== 'IMG' || img.dataset.falhou) return;
+          img.dataset.falhou = '1';
+          const nome = (img.getAttribute('src') || '').split('/').pop().replace('.png', '');
+          img.alt = nome;
+          img.className += ' bg-gray-100 border-4 border-dashed border-gray-300 p-4 text-xl font-bold text-gray-500';
+        };
+        window.addEventListener('error', aoFalhar, true);
+        return () => window.removeEventListener('error', aoFalhar, true);
+      }, []);
+ 
       // Lê a instrução automaticamente ao abrir cada pergunta
       useEffect(() => {
         if (gameState === 'PLAYING') {
           falarTexto(perguntaAtual.descricao);
         }
       }, [currentIndex, gameState]);
-
+ 
       return (
         <ForestBackground>
-
+ 
           {gameState === 'START' && (
             <CloudBox className="w-full max-w-xl animate-fade-in-up">
               {<div className="text-6xl mb-4">🌳🦉📚</div>}
               <h1 className="text-4xl md:text-5xl font-black text-[#B2D548] mb-4 drop-shadow-sm leading-tight">
                 Aprendendo e se<br/>Divertindo!
               </h1>
-              <p className="text-xl text-gray-500 font-medium mb-8">Vamos começar no nível fácil e subir de dificuldade!</p>
+              <p className="text-xl text-gray-500 font-medium mb-6">Vamos começar no nível fácil e subir de dificuldade!</p>
+              <SeletorVoz />
               <button
                 onClick={startGame}
                 className="bg-gradient-to-b from-[#B2D548] to-[#9fc23d] hover:from-[#a3c63f] hover:to-[#8bb034] text-white font-extrabold text-3xl py-4 px-12 rounded-full shadow-lg transform transition hover:scale-105 active:scale-95 flex items-center justify-center mx-auto gap-3 border-b-4 border-green-700"
@@ -375,7 +420,7 @@
               </button>
             </CloudBox>
           )}
-
+ 
           {gameState === 'PLAYING' && (
             <div className={`w-full ${perguntaAtual.type === 'esconde' ? 'max-w-5xl' : 'max-w-2xl'} flex flex-col items-center animate-fade-in-up`}>
               <div className="flex justify-between w-full mb-6 px-4">
@@ -386,7 +431,7 @@
                   Pontos: {score}
                 </div>
               </div>
-
+ 
               <CloudBox className="w-full">
                 {perguntaAtual.icon && (
                   <div className="text-6xl mb-6 flex justify-center">
@@ -400,12 +445,12 @@
                     {perguntaAtual.text}
                   </h2>
                 </div>
-
+ 
                 {/* Botão de áudio */}
                 <div className="mb-8 flex justify-center">
                   <BotaoAudio texto={perguntaAtual.descricao} />
                 </div>
-
+ 
                 {perguntaAtual.type === 'ligue'
                   ? (<LigueQuestao
                       key={perguntaAtual.id}
@@ -443,7 +488,7 @@
               </CloudBox>
             </div>
           )}
-
+ 
           {gameState === 'FEEDBACK' && (
             <CloudBox className={`w-full max-w-xl border-8 ${isCorrect ? 'border-green-400' : 'border-orange-400'} animate-bounce-slight`}>
               <div className="flex flex-col items-center">
@@ -469,7 +514,7 @@
               </div>
             </CloudBox>
           )}
-
+ 
           {gameState === 'LEVEL_UP' && (
             <CloudBox className="w-full max-w-xl text-center animate-fade-in-up border-8 border-blue-400">
               <div className="text-7xl mb-6 animate-bounce">🚀✨</div>
@@ -485,7 +530,7 @@
               </button>
             </CloudBox>
           )}
-
+ 
           {gameState === 'END' && (
             <CloudBox className="w-full max-w-xl text-center animate-fade-in-up">
               <div className="flex justify-center mb-6 text-yellow-400 gap-2">
@@ -501,11 +546,11 @@
               </button>
             </CloudBox>
           )}
-
+ 
         </ForestBackground>
       );
     }
-
+ 
     const root = ReactDOM.createRoot(document.getElementById('root'));
     root.render(<App />);
   </script>
