@@ -35,7 +35,7 @@
   <script type="text/babel" data-type="module">
     const { useState, useEffect, useMemo } = React;
  
-    // SVG
+    // --- Ícones SVG embutidos ---
     const IconPlay = ({ size = 24 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>;
     const IconStar = ({ size = 24, className = '' }) => <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>;
     const IconArrowRight = ({ size = 24 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>;
@@ -49,7 +49,8 @@
       </svg>
     );
  
-    // Seq. Perguntas
+    // --- Sequência Progressiva de Perguntas ---
+    // "descricao" é o texto lido em voz alta
     const sequenciaDePerguntas = [
       // FÁCIL
       {nivel: 'Fácil', type: 'syllable', text: 'VA - ___', descricao: 'Escolha a sílaba que completa a palavra VACA.', options: ['CA', 'CO'], correct: 'CA', icon: 'facil/vaca.png' },
@@ -97,26 +98,24 @@
     const perguntaCapivara = sequenciaDePerguntas.find(p => p.type === 'esconde');
     const embaralhar = (lista) => [...lista].sort(() => Math.random() - 0.5);
  
-    // Voz
+    // --- Narração: 1) voz feminina online (a mesma em QUALQUER aparelho, sem arquivos)
+    //                2) sem internet/bloqueado: voz feminina do aparelho (Web Speech) ---
     const temVoz = () => 'speechSynthesis' in window;
     let vozEscolhida = null;
     const norm = (v) => (v.lang || '').replace('_', '-').toLowerCase();
     const feminina = /francisca|thalita|luciana|fernanda|vit[oó]ria|camila|maria|helena|helia|raquel|catarina|joana|in[eê]s|am[aá]lia|leila|giovanna|google portugu[eê]s|\bfemale\b|feminin|woman|mulher/i;
     const masculina = /daniel|ant[oó]nio|felipe|ricardo|jorge|jo[aã]o|\bmale\b|masculin|\bman\b/i;
  
-    const ehFeminina = (v) => feminina.test(v.name) && !masculina.test(v.name);
- 
+    // pt, nunca masculina; as de nome feminino e pt-BR vêm primeiro
     const listarVozesPt = () => {
       if (!temVoz()) return [];
+      const pontos = (v) => (feminina.test(v.name) ? 2 : 0) + (norm(v) === 'pt-br' ? 1 : 0);
       return window.speechSynthesis.getVoices()
-        .filter(v => norm(v).startsWith('pt') && ehFeminina(v))
-        .sort((x, y) => (norm(y) === 'pt-br') - (norm(x) === 'pt-br'));
+        .filter(v => norm(v).startsWith('pt') && !masculina.test(v.name))
+        .sort((x, y) => pontos(y) - pontos(x));
     };
  
-    const escolherVoz = () => {
-      const lista = listarVozesPt();
-      vozEscolhida = lista[0] || null;
-    };
+    const escolherVoz = () => { vozEscolhida = listarVozesPt()[0] || null; };
  
     if (temVoz()) {
       escolherVoz();
@@ -127,27 +126,70 @@
       if (!temVoz()) return false;
       window.speechSynthesis.cancel();
       escolherVoz();
-      if (!vozEscolhida) return false; 
+      const semListaDeVozes = window.speechSynthesis.getVoices().length === 0;
+      // lista ainda vazia (iPad/Chromebook às vezes demoram): usa a voz padrão do aparelho em pt-BR
+      if (!vozEscolhida && !semListaDeVozes) return false;
       const fala = new SpeechSynthesisUtterance(texto);
       fala.lang = 'pt-BR';
-      fala.voice = vozEscolhida;
-      fala.rate = 0.85;   
-      fala.pitch = 1.05; 
+      if (vozEscolhida) fala.voice = vozEscolhida;
+      fala.rate = 0.85;
+      fala.pitch = 1.05;
       fala.volume = 0.9;
       if (aoIniciar) fala.onstart = aoIniciar;
-      if (aoTerminar) {
-        fala.onend = aoTerminar;
-        fala.onerror = aoTerminar;
-      }
+      if (aoTerminar) { fala.onend = aoTerminar; fala.onerror = aoTerminar; }
       window.speechSynthesis.speak(fala);
       return true;
     };
  
-    const BotaoAudio = ({ texto }) => {
+    // Um único <audio>, reaproveitado (iPad/Safari liberam o som depois do 1º toque)
+    const audioUnico = new Audio();
+    const SILENCIO = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=';
+ 
+    const pararAudio = () => {
+      if (temVoz()) window.speechSynthesis.cancel();
+      audioUnico.onplay = audioUnico.onended = audioUnico.onerror = null;
+      audioUnico.pause();
+    };
+ 
+    // Chamar dentro de um clique: libera áudio e fala no iPad/Safari/Chromebook
+    const desbloquearAudio = () => {
+      try {
+        audioUnico.src = SILENCIO;
+        const p = audioUnico.play();
+        if (p && p.catch) p.catch(() => {});
+        if (temVoz()) {
+          const u = new SpeechSynthesisUtterance(' ');
+          u.volume = 0;
+          window.speechSynthesis.speak(u);
+        }
+      } catch (e) {}
+    };
+ 
+    // Lê a pergunta com a voz feminina online; se falhar, usa a voz do aparelho
+    const urlVoz = (texto) => 'https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=pt-BR&q=' + encodeURIComponent(texto);
+    const falarPergunta = (id, texto, aoIniciar, aoTerminar, aoFalhar) => {
+      pararAudio();
+      let caiu = false;
+      const usarVoz = () => {
+        if (caiu) return;
+        caiu = true;
+        const ok = falarTexto(texto, aoIniciar, aoTerminar);
+        if (!ok) { if (aoTerminar) aoTerminar(); if (aoFalhar) aoFalhar(); }
+      };
+      audioUnico.onplay = () => { if (aoIniciar) aoIniciar(); };
+      audioUnico.onended = () => { if (aoTerminar) aoTerminar(); };
+      audioUnico.onerror = usarVoz;
+      audioUnico.src = urlVoz(texto);
+      audioUnico.playbackRate = 0.92; // um pouco mais calma
+      const p = audioUnico.play();
+      if (p && p.catch) p.catch(usarVoz);
+    };
+ 
+    const BotaoAudio = ({ id, texto }) => {
       const [falando, setFalando] = useState(false);
       const falar = () => {
-        const ok = falarTexto(texto, () => setFalando(true), () => setFalando(false));
-        if (!ok) alert('Não encontrei uma voz feminina em português neste aparelho.');
+        falarPergunta(id, texto, () => setFalando(true), () => setFalando(false),
+          () => alert('Não consegui tocar a voz. Confira a internet ou se o aparelho tem voz em português.'));
       };
       return (
         <button
@@ -183,7 +225,7 @@
     function CapivaraEscondida({ imagem, capivara, falsos, onErrar, onAchar }) {
       const [achou, setAchou] = useState(false);
  
-
+      // depois de 3 segundos de comemoração, avisa o jogo
       useEffect(() => {
         if (!achou) return;
         const t = setTimeout(onAchar, 3000);
@@ -291,9 +333,9 @@
       const [isCorrect, setIsCorrect] = useState(false);
       const [posCapivara, setPosCapivara] = useState(0);
  
-      const pararAudio = () => { if (temVoz()) window.speechSynthesis.cancel(); };
  
       const startGame = () => {
+        desbloquearAudio();
         setCurrentIndex(0);
         setScore(0);
         setPosCapivara(Math.floor(Math.random() * perguntaCapivara.capivara.posicoes.length));
@@ -365,10 +407,10 @@
         return () => window.removeEventListener('error', aoFalhar, true);
       }, []);
  
-      // Lê a desc/instrução automaticamente ao abrir cada pergunta
+      // Lê a instrução automaticamente ao abrir cada pergunta
       useEffect(() => {
         if (gameState === 'PLAYING') {
-          falarTexto(perguntaAtual.descricao);
+          falarPergunta(perguntaAtual.id, perguntaAtual.descricao);
         }
       }, [currentIndex, gameState]);
  
@@ -418,7 +460,7 @@
  
                 {/* Botão de áudio */}
                 <div className="mb-8 flex justify-center">
-                  <BotaoAudio texto={perguntaAtual.descricao} />
+                  <BotaoAudio id={perguntaAtual.id} texto={perguntaAtual.descricao} />
                 </div>
  
                 {perguntaAtual.type === 'ligue'
@@ -487,7 +529,6 @@
  
           {gameState === 'LEVEL_UP' && (
             <CloudBox className="w-full max-w-xl text-center animate-fade-in-up border-8 border-blue-400">
-              <div className="text-7xl mb-6 animate-bounce">🚀✨</div>
               <h2 className="text-5xl font-black text-blue-600 mb-4">Incrível!</h2>
               <p className="text-2xl text-blue-800 font-medium mb-8">
                 Você subiu de nível! Agora vamos para o nível<br/>
