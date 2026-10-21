@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="pt-PT">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Aprendendo e se Divertindo!</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.10/babel.min.js"></script>
   <style>
     body { margin: 0; font-family: system-ui, -apple-system, sans-serif; }
     .animate-fade-in-up { animation: fadeInUp 0.5s ease-out forwards; }
@@ -20,17 +20,22 @@
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-5px); }
     }
+    .capivara-cresce { animation: crescer 1.2s ease-out forwards; }
+    @keyframes crescer {
+      from { transform: scale(0.1); opacity: 0.5; }
+      to   { transform: scale(1);   opacity: 1; }
+    }
+    .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
   </style>
 </head>
 <body>
   <div id="root"></div>
 
   <script type="text/babel" data-type="module">
-    const { useState, useEffect } = React;
+    const { useState, useEffect, useMemo } = React;
 
     // --- Ícones SVG embutidos ---
-    const IconCloud = ({ size = 24 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M17.5 19c2.5 0 4.5-2 4.5-4.5S20 10 17.5 10c-.1 0-.3 0-.4 0A7.5 7.5 0 0 0 3.2 13a4.5 4.5 0 0 0 1.3 8.8h13z"/></svg>;
-    const IconTree = ({ size = 24 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22v-8"/><path d="M6 10a4 4 0 0 1-4-4 4 4 0 0 1 4-4 4 4 0 0 1 4 4 4 4 0 0 1 4-4 4 4 0 0 1 4 4 4 4 0 0 1-4 4"/></svg>;
     const IconPlay = ({ size = 24 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>;
     const IconStar = ({ size = 24, className = '' }) => <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>;
     const IconArrowRight = ({ size = 24 }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>;
@@ -45,41 +50,89 @@
     );
 
     // --- Sequência Progressiva de Perguntas ---
+    // "descricao" é o texto lido em voz alta
     const sequenciaDePerguntas = [
       // FÁCIL
-      { id: 1, nivel: 'Fácil', type: 'syllable', text: 'VA - ___', descricao: 'Escolha a sílaba que completa a palavra VACA.', options: ['CA', 'CO'], correct: 'CA', icon: '🐄' },
-      { id: 2, nivel: 'Fácil', type: 'syllable', text: 'RA - ___', descricao: 'Escolha a sílaba que completa a palavra RATO.', options: ['TO', 'TU'], correct: 'TO', icon: '🐭' },
-      { id: 3, nivel: 'Fácil', type: 'syllable', text: 'SA - ___', descricao: 'Escolha a sílaba que completa a palavra SAPO.', options: ['PE', 'PO'], correct: 'PO', icon: '🐸' },
-      { id: 4, nivel: 'Fácil', type: 'color', text: 'Qual objeto é o AMARELO?', descricao: 'Escolha o objeto que é da cor amarela.', options: ['Sol', 'Céu', 'Sapo'], correct: 'Sol', icon: '🎨' },
-      { id: 5, nivel: 'Fácil', type: 'color', text: 'Qual objeto é o VERDE?', descricao: 'Escolha o objeto que é da cor verde.', options: ['Sol', 'Céu', 'Sapo'], correct: 'Sapo', icon: '🎨' },
-      { id: 6, nivel: 'Fácil', type: 'color', text: 'Qual objeto é o AZUL?', descricao: 'Escolha o objeto que é da cor azul.', options: ['Céu', 'Sapo', 'Sol'], correct: 'Céu', icon: '🎨' },
-      { id: 7, nivel: 'Fácil', type: 'habitat', text: 'Onde o Sapo mora?', descricao: 'Escolha o lugar onde o sapo mora.', options: ['Lagoa', 'Colmeia', 'Deserto'], correct: 'Lagoa', icon: '🐸' },
-      { id: 8, nivel: 'Fácil', type: 'habitat', text: 'Onde a Abelha mora?', descricao: 'Escolha o lugar onde a abelha mora.', options: ['Colmeia', 'Lagoa', 'Deserto'], correct: 'Colmeia', icon: '🐝' },
+      {nivel: 'Fácil', type: 'syllable', text: 'VA - ___', descricao: 'Escolha a sílaba que completa a palavra VACA.', options: ['CA', 'CO'], correct: 'CA', icon: 'facil/vaca.png' },
+      {nivel: 'Fácil', type: 'syllable', text: 'RA - ___', descricao: 'Escolha a sílaba que completa a palavra RATO.', options: ['TO', 'TU'], correct: 'TO', icon: 'facil/rato.png' },
+      {nivel: 'Fácil', type: 'syllable', text: 'SA - ___', descricao: 'Escolha a sílaba que completa a palavra SAPO.', options: ['PE', 'PO'], correct: 'PO', icon: 'facil/sapo.png' },
+      {nivel: 'Fácil', type: 'color', text: 'Qual bolinha é da cor AMARELO?', descricao: 'Escolha a bolinha da cor amarela.', options: ['facil/amarelo.png', 'facil/azul.png', 'facil/verde.png'], correct: 'facil/amarelo.png', icon: null },
+      {nivel: 'Fácil', type: 'color', text: 'Qual bolinha é da cor VERDE?', descricao: 'Escolha a bolinha da cor verde.', options: ['facil/rosa.png', 'facil/verde.png', 'facil/amarelo.png'], correct: 'facil/verde.png', icon: null },
+      {nivel: 'Fácil', type: 'color', text: 'Qual bolinha é da cor AZUL?', descricao: 'Escolha a bolinha da cor azul.', options: ['facil/verde.png', 'facil/azul.png', 'facil/roxo.png'], correct: 'facil/azul.png', icon: null },
+      {nivel: 'Fácil', type: 'habitat', text: 'Onde o Sapo mora?', descricao: 'Escolha o lugar onde o sapo mora.', options: ['facil/lagoa.png', 'facil/colmeia.png', 'facil/deserto.png'], correct: 'facil/lagoa.png', icon: 'facil/sapo.png' },
+      {nivel: 'Fácil', type: 'habitat', text: 'Onde a Abelha mora?', descricao: 'Escolha o lugar onde a abelha mora.', options: ['facil/deserto.png', 'facil/lagoa.png', 'facil/colmeia.png'], correct: 'facil/colmeia.png', icon: 'facil/abelha.png' },
 
       // MÉDIO
-      { id: 10, nivel: 'Médio', type: 'syllable', text: 'SA - PA - ___', descricao: 'Escolha a sílaba que completa a palavra SAPATO.', options: ['TO', 'TA', 'TE'], correct: 'TO', icon: '👞' },
-      { id: 11, nivel: 'Médio', type: 'syllable', text: 'CA - SA - ___', descricao: 'Escolha a sílaba que completa a palavra CASACO.', options: ['CA', 'CO', 'CU'], correct: 'CO', icon: '🧥' },
-      { id: 12, nivel: 'Médio', type: 'syllable', text: 'TA - PE - ___', descricao: 'Escolha a sílaba que completa a palavra TAPETE.', options: ['TA', 'TI', 'TE'], correct: 'TE', icon: '🛋️' },
-      { id: 14, nivel: 'Médio', type: 'rima', text: 'O que rima com SABÃO?', descricao: 'Escolha a palavra que rima com SABÃO.', options: ['BALÃO', 'TELHA', 'CASA'], correct: 'BALÃO', icon: '🫧' },
+      {nivel: 'Médio', type: 'syllable', text: 'SA - PA - ___', descricao: 'Escolha a sílaba que completa a palavra SAPATO.', options: ['TO', 'TA', 'TE'], correct: 'TO', icon: 'medio/sapato.png' },
+      {nivel: 'Médio', type: 'syllable', text: 'CA - SA - ___', descricao: 'Escolha a sílaba que completa a palavra CASACO.', options: ['CA', 'CO', 'CI'], correct: 'CO', icon: 'medio/casaco.png' },
+      {nivel: 'Médio', type: 'syllable', text: 'TA - PE - ___', descricao: 'Escolha a sílaba que completa a palavra TAPETE.', options: ['TA', 'TI', 'TE'], correct: 'TE', icon: 'medio/tapete.png' },
+      {nivel: 'Médio', type: 'rima', text: 'O que rima com SABÃO?', descricao: 'Escolha a figura que rima com SABÃO.', options: ['medio/balao.png', 'medio/telha.png', 'medio/casa.png'], correct: 'medio/balao.png', icon: 'medio/sabao.png' },
+      {nivel: 'Médio', type: 'ligue', text: 'Ligue os conjuntos com a mesma quantidade', descricao: 'Ligue os conjuntos que têm a mesma quantidade de bichinhos. Clique em uma figura da esquerda e depois na da direita.', pares: [{ a: 'medio/cachorro.png',   b: 'medio/tartaruga.png' }, { a: 'medio/borboletas.png',  b: 'medio/abelhas.png' }, { a: 'medio/joaninhas.png', b: 'medio/peixes.png' }], options: [], correct: 'ok', icon: null, fixo: true },
 
       // DIFÍCIL
-      { id: 18, nivel: 'Difícil', type: 'syllable', text: 'Selecione o animal atrás do patinho amarelinho', descricao: 'Escolha o animal que está atrás do patinho amarelinho.', options: ['TARTARUGA', 'SAPO', 'PATINHO AMARELINHO', 'ELEFANTE'], correct: 'ELEFANTE', icon: '🐘' },
-      { id: 19, nivel: 'Difícil', type: 'syllable', text: 'Selecione a cena em que o macaco está atrás da árvore', descricao: 'Escolha a posição em que o macaco está em relação à árvore.', options: ['LADO', 'FRENTE', 'ATRÁS'], correct: 'ATRÁS', icon: '🐘' },
-      { id: 22, nivel: 'Difícil', type: 'syllable', text: 'E - LE - FAN - ___', descricao: 'Escolha a sílaba que completa a palavra ELEFANTE.', options: ['TE', 'TA', 'TI', 'TU'], correct: 'TE', icon: '🐘' },
-      { id: 23, nivel: 'Difícil', type: 'syllable', text: 'BI - CI - CLE - ___', descricao: 'Escolha a sílaba que completa a palavra BICICLETA.', options: ['TA', 'BA', 'BE', 'BO'], correct: 'TA', icon: '🚲' },
+      {nivel: 'Difícil', type: 'syllable', text: 'Selecione o animal atrás do patinho amarelinho', descricao: 'Escolha o animal que está atrás do patinho amarelinho.', options: ['dificil/tartaruga.png', 'dificil/pato.png', 'dificil/elefante.png', 'dificil/sapo.png'], correct: 'dificil/elefante.png', icon: null, fixo: true },
+      {nivel: 'Difícil', type: 'syllable', text: 'Selecione a cena em que o macaco está atrás da árvore', descricao: 'Escolha a cena em que o macaco está atrás da árvore.', options: ['dificil/macacoladoarvore.png', 'dificil/macacofrentearvore.png', 'dificil/macacotrasarvore.png'], correct: 'dificil/macacotrasarvore.png', icon: 'dificil/macaco.png' },
+      {nivel: 'Difícil', type: 'syllable', text: 'Selecione a cena em que o macaco está na frente da árvore', descricao: 'Escolha a cena em que o macaco está na frente da árvore.', options: ['dificil/macacofrentearvore.png', 'dificil/macacotrasarvore.png', 'dificil/macacoladoarvore.png'], correct: 'dificil/macacofrentearvore.png', icon: 'dificil/macaco.png' },
+      {nivel: 'Difícil', type: 'syllable', text: 'Selecione a cena em que o macaco está ao lado da árvore', descricao: 'Escolha a cena em que o macaco está ao lado da árvore.', options: ['dificil/macacotrasarvore.png', 'dificil/macacoladoarvore.png', 'dificil/macacofrentearvore.png'], correct: 'dificil/macacoladoarvore.png', icon: 'dificil/macaco.png' },
+      {nivel: 'Difícil', type: 'syllable', text: 'E - LE - FAN - ___', descricao: 'Escolha a sílaba que completa a palavra ELEFANTE.', options: ['TE', 'TA', 'TI', 'TU'], correct: 'TE', icon: 'dificil/elefante.png' },
+      {nivel: 'Difícil', type: 'syllable', text: 'BI - CI - CLE - ___', descricao: 'Escolha a sílaba que completa a palavra BICICLETA.', options: ['TA', 'DA', 'TE', 'BO'], correct: 'TA', icon: 'dificil/bike.png' },
 
       // EXPERT
-      { id: 27, nivel: 'Expert', type: 'syllable', text: 'PA - RA - LE - LE - PÍ - PE - ___', descricao: 'Escolha a sílaba que completa a palavra PARALELEPÍPEDO.', options: ['DO', 'PE-DA', 'PI-DA', 'PO-DO'], correct: 'DO', icon: '🧱' }
-    ];
+      {nivel: 'Expert', type: 'contagem', text: 'Contando as figuras', descricao: 'Conte quantas figuras tem na imagem e escolha o número certo.', options: ['3', '4', '5'], correct: '3', icon: 'expert/saposconta.png', fixo: true },
+      {nivel: 'Expert', type: 'contagem', text: 'Contando as figuras', descricao: 'Conte quantas figuras tem na imagem e escolha o número certo.', options: ['4', '6', '8'], correct: '6', icon: 'expert/macacosconta.png', fixo: true },
+      {nivel: 'Expert', type: 'contagem', text: 'Contando as figuras', descricao: 'Conte quantas figuras tem na imagem e escolha o número certo.', options: ['1', '3', '5'], correct: '5', icon: 'expert/abelhasconta.png', fixo: true },
+      {nivel: 'Expert', type: 'syllable', text: 'PA - RA - LE - LE - PÍ - ___ - ___ ', descricao: 'Escolha as duas sílabas que completam a palavra PARALELEPÍPEDO.', options: ['PE-DO', 'PE-DA', 'PI-DA', 'PO-DO'], correct: 'PE-DO', icon: 'expert/paralelepipedo.png' },
+      {nivel: 'Expert', type: 'esconde', text: 'Ache a capivara', descricao: 'Procure a capivara escondida na paisagem e clique nela.', imagem: 'expert/paisagem.png',
+        capivara: { img: 'expert/capivara.png', posicoes: [
+          { x: 80, y: 68, w: 6 },
+          { x: 12, y: 84, w: 6 },
+          { x: 88, y: 82, w: 6 }
+        ] },
+        falsos: [
+          { x: 0,  y: 55, w: 22, h: 45 },   // arbustos grandes embaixo à esquerda
+          { x: 64, y: 60, w: 36, h: 40 },   // arbustos grandes embaixo à direita
+          { x: 71, y: 67, w: 8,  h: 10 }    // arbusto pequeno na margem direita
+        ], options: [], correct: 'capivara', icon: null }
+    ].map((p, i) => ({ ...p, id: i + 1 }));
 
-    // --- Função de fala (Web Speech API) ---
+    const perguntaCapivara = sequenciaDePerguntas.find(p => p.type === 'esconde');
+    const embaralhar = (lista) => [...lista].sort(() => Math.random() - 0.5);
+
+    // --- Voz feminina suave (Web Speech API) ---
+    const temVoz = () => 'speechSynthesis' in window;
+    let vozEscolhida = null;
+
+    const escolherVoz = () => {
+      if (!temVoz()) return;
+      const todas = window.speechSynthesis.getVoices();
+      const norm = (v) => (v.lang || '').replace('_', '-').toLowerCase();
+      const ptBR = todas.filter(v => norm(v) === 'pt-br');
+      const pt = todas.filter(v => norm(v).startsWith('pt'));
+      const lista = ptBR.length ? ptBR : pt;
+      const feminina = /francisca|luciana|maria|vit[oó]ria|camila|fernanda|thalita|google portugu[eê]s|\bfemale\b|feminin/i;
+      const masculina = /daniel|ant[oó]nio|felipe|ricardo|jorge|\bmale\b|masculin/i;
+      vozEscolhida =
+        lista.find(v => feminina.test(v.name) && !masculina.test(v.name)) ||
+        lista.find(v => !masculina.test(v.name)) ||
+        lista[0] || null;
+    };
+
+    if (temVoz()) {
+      escolherVoz();
+      // muitos navegadores carregam as vozes só depois de um instante
+      window.speechSynthesis.onvoiceschanged = escolherVoz;
+    }
+
     const falarTexto = (texto, aoIniciar, aoTerminar) => {
-      if (!('speechSynthesis' in window)) return false;
-      window.speechSynthesis.cancel(); // para qualquer fala anterior
+      if (!temVoz()) return false;
+      window.speechSynthesis.cancel();
+      if (!vozEscolhida) escolherVoz();
       const fala = new SpeechSynthesisUtterance(texto);
       fala.lang = 'pt-BR';
-      fala.rate = 0.85;  // um pouco mais devagar, bom para crianças
-      fala.pitch = 1.1;
+      if (vozEscolhida) fala.voice = vozEscolhida;
+      fala.rate = 0.85;   // devagar e calma, bom para crianças
+      fala.pitch = 1.05;  // levemente mais agudo, mas sem exagero (suave)
+      fala.volume = 0.9;
       if (aoIniciar) fala.onstart = aoIniciar;
       if (aoTerminar) {
         fala.onend = aoTerminar;
@@ -91,12 +144,10 @@
 
     const BotaoAudio = ({ texto }) => {
       const [falando, setFalando] = useState(false);
-
       const falar = () => {
         const ok = falarTexto(texto, () => setFalando(true), () => setFalando(false));
         if (!ok) alert('Seu navegador não suporta áudio.');
       };
-
       return (
         <button
           onClick={falar}
@@ -118,7 +169,7 @@
         backgroundRepeat: 'no-repeat'
       }}
     >
-      <div className="relative z-10 w-full max-w-3xl flex justify-center">{children}</div>
+      <div className="relative z-10 w-full max-w-5xl flex justify-center">{children}</div>
     </div>
     );
 
@@ -128,21 +179,128 @@
       </div>
     );
 
+    function CapivaraEscondida({ imagem, capivara, falsos, onErrar, onAchar }) {
+      const [achou, setAchou] = useState(false);
+
+      // depois de 3 segundos de comemoração, avisa o jogo
+      useEffect(() => {
+        if (!achou) return;
+        const t = setTimeout(onAchar, 3000);
+        return () => clearTimeout(t);
+      }, [achou]);
+
+      return (
+        <div className="relative w-full mx-auto">
+          <img src={imagem} alt="" className="block w-full rounded-3xl" />
+
+          {falsos.map((f, i) => (
+            <button
+              key={i}
+              onClick={onErrar}
+              className="absolute rounded-3xl cursor-pointer"
+              style={{ left: f.x + '%', top: f.y + '%', width: f.w + '%', height: f.h + '%' }}
+            />
+          ))}
+
+          <button
+            onClick={() => setAchou(true)}
+            className="absolute cursor-pointer"
+            style={{ left: capivara.x + '%', top: capivara.y + '%', width: capivara.w + '%' }}
+          >
+            <img src={capivara.img} alt="" className="block w-full" />
+          </button>
+
+          {achou && ReactDOM.createPortal(
+            <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black bg-opacity-60 fade-in">
+              <img src={capivara.img} alt="" className="capivara-cresce" style={{ width: '60vmin' }} />
+              <p className="text-white text-5xl font-black mt-6 drop-shadow-lg">Você achou!</p>
+            </div>,
+            document.body
+          )}
+        </div>
+      );
+    }
+
+    function LigueQuestao({ pares, onConcluir }) {
+      // coluna da direita embaralhada (só uma vez)
+      const [direita] = useState(() =>
+        pares.map((p, i) => ({ id: i, img: p.b })).sort(() => Math.random() - 0.5)
+      );
+      const [selecionado, setSelecionado] = useState(null); // id escolhido na esquerda
+      const [feitos, setFeitos] = useState([]);              // ids dos pares já ligados
+      const [erro, setErro] = useState(null);                // id da direita que errou
+
+      useEffect(() => {
+        if (feitos.length === pares.length) {
+          const t = setTimeout(onConcluir, 700);
+          return () => clearTimeout(t);
+        }
+      }, [feitos]);
+
+      const clicarEsquerda = (id) => {
+        if (feitos.includes(id)) return;
+        setSelecionado(id);
+        setErro(null);
+      };
+
+      const clicarDireita = (id) => {
+        if (selecionado === null || feitos.includes(id)) return;
+        if (selecionado === id) {
+          setFeitos([...feitos, id]);
+          setSelecionado(null);
+          setErro(null);
+        } else {
+          setErro(id);
+          setSelecionado(null);
+        }
+      };
+
+      const estilo = (id, escolhido, errado) =>
+        'p-2 rounded-3xl border-4 transition transform hover:scale-105 ' +
+        (feitos.includes(id) ? 'border-green-500 bg-green-100 opacity-70'
+          : escolhido ? 'border-blue-500 bg-blue-100'
+          : errado ? 'border-orange-400 bg-orange-100'
+          : 'border-transparent bg-white');
+
+      return (
+        <div className="flex justify-center gap-16 w-full">
+          <div className="flex flex-col gap-4">
+            {pares.map((p, i) => (
+              <button key={i} onClick={() => clicarEsquerda(i)} className={estilo(i, selecionado === i, false)}>
+                <img src={p.a} alt="" className="h-24 object-contain rounded-2xl" />
+              </button>
+            ))}
+          </div>
+          <div className="flex flex-col gap-4">
+            {direita.map((d) => (
+              <button key={d.id} onClick={() => clicarDireita(d.id)} className={estilo(d.id, false, erro === d.id)}>
+                <img src={d.img} alt="" className="h-24 object-contain rounded-2xl" />
+              </button>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
     function App() {
       // Estados possíveis: 'START', 'PLAYING', 'FEEDBACK', 'LEVEL_UP', 'END'
       const [gameState, setGameState] = useState('START');
       const [currentIndex, setCurrentIndex] = useState(0);
       const [score, setScore] = useState(0);
       const [isCorrect, setIsCorrect] = useState(false);
+      const [posCapivara, setPosCapivara] = useState(0);
+
+      const pararAudio = () => { if (temVoz()) window.speechSynthesis.cancel(); };
 
       const startGame = () => {
         setCurrentIndex(0);
         setScore(0);
+        setPosCapivara(Math.floor(Math.random() * perguntaCapivara.capivara.posicoes.length));
         setGameState('PLAYING');
       };
 
       const handleAnswer = (option) => {
-        if ('speechSynthesis' in window) window.speechSynthesis.cancel(); // para o áudio ao responder
+        pararAudio(); // para o áudio ao responder
         const correct = option === sequenciaDePerguntas[currentIndex].correct;
         setIsCorrect(correct);
         if (correct) setScore(prev => prev + 10);
@@ -174,20 +332,25 @@
         setGameState('PLAYING');
       };
 
-      const getButtonColor = (option, type) => {
-        if (type === 'color') {
-          switch (option.toLowerCase()) {
-            case 'sol': return 'bg-yellow-400 hover:bg-yellow-500 border-yellow-500 text-yellow-900';
-            case 'céu': return 'bg-blue-500 hover:bg-blue-600 border-blue-600 text-white';
-            case 'sapo': return 'bg-[#B2D548] hover:bg-[#B2D548] border-green-600 text-white';
-          }
-        }
+      const acharCapivara = () => {
+        setScore(prev => prev + 10);
+        setGameState('END');
+      };
+
+      const getButtonColor = () => {
         return 'bg-purple-400 hover:bg-purple-500 border-purple-500 text-white';
       };
 
       const perguntaAtual = sequenciaDePerguntas[currentIndex];
+      const opcoes = useMemo(() => perguntaAtual.fixo ? perguntaAtual.options : embaralhar(perguntaAtual.options), [currentIndex]);
+      const nomesComAcento = { balao: 'Balão'};
+      const nomeDaImagem = (caminho) => {
+        const arquivo = caminho.split('/').pop().replace('.png', '');
+        if (nomesComAcento[arquivo]) return nomesComAcento[arquivo];
+        return arquivo.charAt(0).toUpperCase() + arquivo.slice(1);
+      };
 
-      // Lê a descrição automaticamente ao abrir cada pergunta
+      // Lê a instrução automaticamente ao abrir cada pergunta
       useEffect(() => {
         if (gameState === 'PLAYING') {
           falarTexto(perguntaAtual.descricao);
@@ -199,7 +362,7 @@
 
           {gameState === 'START' && (
             <CloudBox className="w-full max-w-xl animate-fade-in-up">
-              {/* <div className="text-6xl mb-4">🌳🦉✨</div> */}
+              {<div className="text-6xl mb-4">🌳🦉📚</div>}
               <h1 className="text-4xl md:text-5xl font-black text-[#B2D548] mb-4 drop-shadow-sm leading-tight">
                 Aprendendo e se<br/>Divertindo!
               </h1>
@@ -214,7 +377,7 @@
           )}
 
           {gameState === 'PLAYING' && (
-            <div className="w-full max-w-2xl flex flex-col items-center animate-fade-in-up">
+            <div className={`w-full ${perguntaAtual.type === 'esconde' ? 'max-w-5xl' : 'max-w-2xl'} flex flex-col items-center animate-fade-in-up`}>
               <div className="flex justify-between w-full mb-6 px-4">
                 <div className="bg-white bg-opacity-90 px-6 py-2 rounded-full font-bold text-[#B2D548] shadow-md border-2 border-green-300 flex items-center gap-2">
                   <IconStar size={20} className="text-yellow-500" /> Nível: {perguntaAtual.nivel} ({currentIndex + 1}/{sequenciaDePerguntas.length})
@@ -225,26 +388,58 @@
               </div>
 
               <CloudBox className="w-full">
-                <div className="text-6xl mb-6">{perguntaAtual.icon}</div>
+                {perguntaAtual.icon && (
+                  <div className="text-6xl mb-6 flex justify-center">
+                    {perguntaAtual.icon.endsWith('.png')
+                    ? <img src={perguntaAtual.icon} alt="" className="h-60 object-contain" />
+                    : perguntaAtual.icon}
+                  </div>
+                )}
                 <div className="bg-blue-50 border-4 border-blue-200 rounded-3xl py-8 px-6 mb-4 shadow-inner">
                   <h2 className="text-3xl md:text-4xl font-black text-blue-700 leading-tight">
                     {perguntaAtual.text}
                   </h2>
                 </div>
 
-                {/* Descrição + áudio */}
-                <div className="mb-8 flex flex-col items-center gap-3">
-                  <p className="text-xl text-gray-600 font-medium">{perguntaAtual.descricao}</p>
+                {/* Botão de áudio */}
+                <div className="mb-8 flex justify-center">
                   <BotaoAudio texto={perguntaAtual.descricao} />
                 </div>
 
-                <div className="flex flex-wrap justify-center gap-4">
-                  {perguntaAtual.options.map((opt, idx) => (
-                    <button key={idx} onClick={() => handleAnswer(opt)} className={`font-extrabold text-3xl py-4 px-8 rounded-[2rem] shadow-md transform transition hover:-translate-y-1 active:translate-y-1 min-w-[140px] border-b-8 active:border-b-0 mt-2 active:mt-[10px] ${getButtonColor(opt, perguntaAtual.type)}`}>
-                      {opt}
-                    </button>
-                  ))}
-                </div>
+                {perguntaAtual.type === 'ligue'
+                  ? (<LigueQuestao
+                      key={perguntaAtual.id}
+                      pares={perguntaAtual.pares}
+                      onConcluir={() => handleAnswer(perguntaAtual.correct)}
+                    />)
+                  : perguntaAtual.type === 'esconde'
+                  ? (<CapivaraEscondida
+                      imagem={perguntaAtual.imagem}
+                      capivara={{ img: perguntaAtual.capivara.img, ...perguntaAtual.capivara.posicoes[posCapivara] }}
+                      falsos={perguntaAtual.falsos}
+                      onErrar={() => handleAnswer('errado')}
+                      onAchar={acharCapivara}
+                    />)
+                  : (
+                    <div className="flex flex-wrap justify-center gap-4">
+                      {opcoes.map((opt, idx) => (
+                        <button key={idx} onClick={() => handleAnswer(opt)} className={
+                          opt.endsWith('.png')
+                          ? 'transform transition hover:scale-110 active:scale-95 p-2'
+                          : `font-extrabold text-3xl py-4 px-8 rounded-[2rem] shadow-md transform transition hover:-translate-y-1 active:translate-y-1 min-w-[140px] border-b-8 active:border-b-0 mt-2 active:mt-[10px] ${getButtonColor(opt, perguntaAtual.type)}`
+                        }>
+                          {opt.endsWith('.png')
+                            ? (<div className="flex flex-col items-center gap-2">
+                                <img src={opt} alt="" className="h-24 object-contain rounded-2xl" />
+                                {['habitat', 'rima'].includes(perguntaAtual.type) && (
+                                  <span className="font-extrabold text-xl text-blue-700">{nomeDaImagem(opt)}</span>
+                                )}
+                              </div>)
+                            : opt}
+                        </button>
+                      ))}
+                    </div>
+                  )}
               </CloudBox>
             </div>
           )}
@@ -254,9 +449,9 @@
               <div className="flex flex-col items-center">
                 {isCorrect ? (
                   <div className="text-center w-full">
-                    <div className="bg-[#B2D548] p-6 rounded-full mb-6 flex justify-center mx-auto w-max"><IconCheck size={80} className="text-[#B2D548]" /></div>
+                    <div className="bg-[#B2D548] text-white p-6 rounded-full mb-6 flex justify-center mx-auto w-max"><IconCheck size={80} /></div>
                     <h2 className="text-5xl font-black text-[#B2D548] mb-4">Fantástico!</h2>
-                    <p className="text-2xl text-[#B2D548] font-bold mb-8 bg-[#B2D548] px-6 py-3 rounded-2xl inline-block">+10 pontos!</p>
+                    <p className="text-2xl text-[#FFFFFF] font-bold mb-8 bg-[#B2D548] px-6 py-3 rounded-2xl inline-block">+10 pontos!</p>
                     <button onClick={avancarPergunta} className="bg-blue-500 hover:bg-blue-600 text-white font-extrabold text-2xl py-4 px-10 rounded-full shadow-lg transform transition hover:scale-105 flex items-center justify-center gap-3 border-b-4 border-blue-700 w-full">
                       {currentIndex + 1 < sequenciaDePerguntas.length ? 'Próxima' : 'Ver Resultado'} <IconArrowRight size={28} />
                     </button>
@@ -280,7 +475,7 @@
               <div className="text-7xl mb-6 animate-bounce">🚀✨</div>
               <h2 className="text-5xl font-black text-blue-600 mb-4">Incrível!</h2>
               <p className="text-2xl text-blue-800 font-medium mb-8">
-                Subiste de nível! Agora vamos para o nível<br/>
+                Você subiu de nível! Agora vamos para o nível<br/>
                 <span className="text-4xl font-black text-blue-700 bg-blue-100 px-6 py-2 rounded-2xl inline-block mt-4 border-2 border-blue-300 shadow-sm">
                   {sequenciaDePerguntas[currentIndex + 1]?.nivel}
                 </span>
@@ -298,7 +493,7 @@
               </div>
               <h2 className="text-5xl font-black text-[#B2D548] mb-4">Fim de Jogo!</h2>
               <div className="bg-gradient-to-br from-yellow-100 to-yellow-300 rounded-[3rem] p-8 mb-8 border-4 border-yellow-400 shadow-inner inline-block w-full">
-                <p className="text-yellow-800 font-bold mb-2 text-xl tracking-wider">A TUA PONTUAÇÃO</p>
+                <p className="text-yellow-800 font-bold mb-2 text-xl tracking-wider">A SUA PONTUAÇÃO</p>
                 <p className="text-7xl font-black text-yellow-600 drop-shadow-md">{score}</p>
               </div>
               <button onClick={startGame} className="bg-[#B2D548] hover:bg-[#B2D548] text-white font-extrabold text-2xl py-4 px-10 rounded-full shadow-lg transform transition hover:scale-105 flex items-center justify-center mx-auto gap-3 border-b-4 border-green-700 w-full md:w-auto">
